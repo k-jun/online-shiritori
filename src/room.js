@@ -21,68 +21,49 @@ const startWithKi = new Rule({
 });
 
 export class Room {
-  constructor() {
+  constructor({ name, color }) {
+    this._name = name;
+    this._color = color;
     this._words = [
-      { value: "", rules: [startWithKi] },
-      { value: "", rules: [startWithKi] },
-      { value: "", rules: [startWithKi] },
-      // { value: "", status: "？", rules: [] },
-      // {
-      //   value: "",
-      //   note: ["このマスの最後の文字は「え」である必要がある"],
-      //   validators: [],
-      //   status: "？",
-      //   warn: [],
-      // },
-      // {
-      //   value: "",
-      //   note: [
-      //     "このマスは3文字である必要がある",
-      //     "このマスに入るものは真ん中の文字が濁点を含んでいる",
-      //   ],
-      //   validators: [],
-      //   status: "？",
-      //   warn: [],
-      // },
-      // {
-      //   value: "",
-      //   note: [
-      //     "このマスは6文字である必要がある",
-      //     "このマスに入るものは自動で動くものである",
-      //   ],
-      //   validators: [],
-      //   status: "？",
-      //   warn: [],
-      // },
-      // {
-      //   value: "",
-      //   note: ["このマスは9文字である必要がある"],
-      //   validators: [],
-      //   status: "？",
-      //   warn: [],
-      // },
+      { value: "", status: "？", rules: [startWithKi] },
+      { value: "", status: "？", rules: [startWithKi] },
+      { value: "", status: "？", rules: [startWithKi] },
     ];
   }
 
   update({ index, value }) {
     this._words[index].value = value;
+    let x = "？";
+    if (value !== "") {
+      x = this._words[index].rules.map((y) => y.func(value)).every((z) => z)
+        ? "OK"
+        : "NG";
+    }
+    this._words[index].status = x;
   }
 
   words() {
     return this._words.map((x, i) => ({
       index: i,
       value: x.value,
-      status:
-        x.value === ""
-          ? "？"
-          : x.rules.map((y) => y.func(x.value)).every((z) => z)
-          ? "OK"
-          : "NG",
+      status: x.status,
       note: x.rules
         .map(
           (y) => (x.value === "" ? "" : y.func(x.value) ? "◯ " : "✕ ") + y.note
         )
         .join(","),
     }));
+  }
+
+  footer() {
+    return {
+      name: this._name,
+      color: this._color,
+      pct: Math.floor(
+        (this._words.filter((e) => e.status === "OK").length /
+          this._words.length) *
+          100
+      ),
+    };
   }
 }

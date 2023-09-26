@@ -1,6 +1,6 @@
 import { h, text, app } from "https://unpkg.com/hyperapp";
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-import { Footer } from "./footer.js";
+import { Footers } from "./footer.js";
 
 let path = "/socket.io";
 if (window.location.pathname !== "/") {
@@ -92,6 +92,7 @@ const InitialState = (_state) => {
   return {
     room: "",
     words: [],
+    footers: [],
   };
 };
 
@@ -135,7 +136,7 @@ const Join = (state, event) => {
 
 const dispatch = app({
   init: InitialState,
-  view: ({ words, room }) => {
+  view: ({ room, words, footers }) => {
     const view = [];
     if (room === "") {
       view.push(Room());
@@ -147,7 +148,7 @@ const dispatch = app({
         }
         view.push(Arrow(), Box({ room, ...words[i] }));
       }
-      view.push(Footer());
+      view.push(Footers({ footers }));
     }
 
     return h("main", {}, [
