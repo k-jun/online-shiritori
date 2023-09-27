@@ -10,11 +10,11 @@ export const Footers = ({ footers }) => {
     "div",
     {
       style: {
-        position: "absolute",
+        position: "sticky",
         left: 0,
         bottom: 0,
         width: "100%",
-        backgroundColor: "#ccc",
+        backgroundColor: "white",
         height: "20px",
       },
     },

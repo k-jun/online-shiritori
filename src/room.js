@@ -49,6 +49,24 @@ export class Room {
         note: "",
         rules: [shiritori, XinY({ x: "に", y: 0 })],
       },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [shiritori1, XinY({ x: "き", y: 0 })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [shiritori, XinY({ x: "ひ", y: 0 })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [shiritori, XinY({ x: "に", y: 0 })],
+      },
     ];
   }
 

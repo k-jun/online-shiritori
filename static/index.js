@@ -1,6 +1,7 @@
 import { h, text, app } from "https://unpkg.com/hyperapp";
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
 import { Footers } from "./footer.js";
+import { Background } from "./background.js";
 
 let path = "/socket.io";
 if (window.location.pathname !== "/") {
@@ -66,7 +67,13 @@ const Box = ({ room, index, value, status, note }) => {
           [text(status)]
         ),
       ]),
-      h("div", {}, text(note)),
+      h(
+        "div",
+        {
+          style: { color: "white" },
+        },
+        text(note)
+      ),
     ]
   );
 };
@@ -82,6 +89,7 @@ const Arrow = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        color: "white",
       },
     },
     text("↓")
@@ -106,6 +114,7 @@ const Room = () => {
         alignItems: "center",
         height: "500px",
         fontSize: "60px",
+        color: "white",
       },
     },
     [
@@ -152,7 +161,12 @@ const dispatch = app({
     }
 
     return h("main", {}, [
-      h("h1", {}, text("しりとり大魔王からの挑戦状")),
+      Background(),
+      h(
+        "h1",
+        { style: { color: "white" } },
+        text("しりとり大魔王からの挑戦状")
+      ),
       h(
         "div",
         {
