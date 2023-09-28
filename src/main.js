@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("update", ({ name, index, value }) => {
-    rooms[name].update({ value, index });
+    rooms[name]?.update({ value, index });
     refresh(name);
   });
 
@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
 function refresh(name) {
   io.to(name).emit("refresh", {
     room: {
-      ...rooms[name].status(),
+      ...rooms[name]?.status(),
       size: io.of("/").adapter.rooms.get(name).size,
     },
     rooms: Object.keys(rooms).map((k) => rooms[k].status()),
