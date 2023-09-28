@@ -1,4 +1,4 @@
-# orthonigarum
+# online-shiritori
 
 ## run
 
