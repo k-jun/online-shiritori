@@ -1,6 +1,6 @@
 import { h, text, app } from "https://unpkg.com/hyperapp";
 import { io } from "https://cdn.socket.io/4.4.1/socket.io.esm.min.js";
-import { Footers } from "./footer.js";
+import { Window, Bar, Line } from "./window.js";
 import { Background } from "./background.js";
 
 let path = "/socket.io";
@@ -9,15 +9,15 @@ if (window.location.pathname !== "/") {
 }
 const socket = io(window.location.origin, { path });
 
-const Update = ({ room, index }) => {
+const Update = ({ name, index }) => {
   return (state, event) => {
-    socket.emit("update", { room, index, value: event.target.value });
-    state.words[index].value = event.target.value;
+    socket.emit("update", { name, index, value: event.target.value });
+    state.room.words[index].value = event.target.value;
     return { ...state };
   };
 };
 
-const Box = ({ room, index, value, status, note }) => {
+const Box = ({ name, index, value, status, note }) => {
   return h(
     "div",
     {
@@ -36,7 +36,7 @@ const Box = ({ room, index, value, status, note }) => {
           {
             value,
             maxLength: 15,
-            onchange: Update({ room, index }),
+            onchange: Update({ name, index }),
             style: {
               flex: 1,
               textAlign: "center",
@@ -53,7 +53,7 @@ const Box = ({ room, index, value, status, note }) => {
           "button",
           {
             value,
-            onclick: Update({ room, index }),
+            onclick: Update({ name, index }),
             style: {
               textAlign: "center",
               fontFamily: "Shinonome14B",
@@ -96,12 +96,9 @@ const Arrow = () => {
   );
 };
 
-const InitialState = (_state) => {
-  return {
-    room: "",
-    words: [],
-    footers: [],
-  };
+const Join = (state, event) => {
+  socket.emit("join", event.target.value);
+  return { ...state };
 };
 
 const Room = () => {
@@ -118,7 +115,7 @@ const Room = () => {
       },
     },
     [
-      text("Room Name: "),
+      text("Team Name: "),
       h(
         "input",
         {
@@ -138,26 +135,52 @@ const Room = () => {
   );
 };
 
-const Join = (state, event) => {
-  socket.emit("join", event.target.value);
-  return { ...state, room: event.target.value };
+const InitialState = (_state) => {
+  return {
+    room: { name: "" },
+    rooms: [],
+  };
 };
 
 const dispatch = app({
   init: InitialState,
-  view: ({ room, words, footers }) => {
+  view: ({ room, rooms }) => {
     const view = [];
-    if (room === "") {
+    if (room.name === "") {
       view.push(Room());
+      view.push(Window({ child: text("チーム名を入力して下さい。") }));
     } else {
-      for (let i = 0; i < words.length; i++) {
+      for (let i = 0; i < room.words.length; i++) {
         if (i === 0) {
-          view.push(Box({ room, ...words[i] }));
+          view.push(Box({ name: room.name, ...room.words[i] }));
           continue;
         }
-        view.push(Arrow(), Box({ room, ...words[i] }));
+        view.push(Arrow(), Box({ name: room.name, ...room.words[i] }));
       }
-      view.push(Footers({ footers }));
+
+      const bars = rooms.map((e) =>
+        Bar({ name: e.name, prog: e.prog, color: "white" })
+      );
+
+      let order =
+        rooms
+          .sort((a, b) => (a.prog > b.prog ? -1 : 1))
+          .findIndex((e) => e.name == room.name) + 1;
+      if (order > rooms.length / 2) {
+        order = "?";
+      }
+
+      view.push(
+        Window({
+          child: [
+            text(
+              `チーム名: ${room.name} チーム人数: ${room.size}人 進捗度: ${room.prog}% 順位: ${order}位`
+            ),
+            Line(),
+            ...bars,
+          ],
+        })
+      );
     }
 
     return h("main", {}, [
@@ -174,6 +197,7 @@ const dispatch = app({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            margin: "0px 0px 200px",
           },
         },
         view
@@ -188,5 +212,6 @@ const Refresh = (state, payload) => {
 };
 
 socket.on("refresh", (payload) => {
+  console.log(payload);
   dispatch(Refresh, payload);
 });

@@ -1,38 +1,61 @@
 import { h, text } from "https://unpkg.com/hyperapp";
 
-export const Footers = ({ footers }) => {
-  footers = footers.sort((a, b) => (a.pct < b.pct ? 1 : -1));
-  footers = footers.map((e) =>
-    e.pct > 90 ? { ...e, pct: 90, name: "???" } : e
-  );
-  const view = footers.map((e) => Footer(e));
+export const Window = ({ child }) => {
   return h(
     "div",
     {
       style: {
-        position: "sticky",
+        position: "fixed",
         left: 0,
-        bottom: 0,
-        width: "100%",
-        backgroundColor: "white",
-        height: "20px",
+        right: 0,
+        bottom: 20,
+        width: "85%",
+        backgroundColor: "black",
+        height: "80px",
+        opacity: 0.8,
+        margin: "auto",
+        borderRadius: "0.3rem",
+        border: "solid 2px white",
+        color: "white",
+        padding: "20px",
       },
     },
-    view
+    child
   );
 };
 
-export const Footer = ({ name, pct, color }) => {
+export const Line = () => {
   return h(
     "div",
     {
       style: {
         position: "absolute",
-        left: 0,
-        bottom: 0,
-        width: pct + "%",
+        left: 30,
+        right: 30,
+        bottom: 20,
+        backgroundColor: "white",
+        height: "2px",
+      },
+    },
+    []
+  );
+};
+
+export const Bar = ({ name, prog, color }) => {
+  if (prog > 90) {
+    prog = 90;
+    name = "???";
+  }
+  return h(
+    "div",
+    {
+      style: {
+        position: "absolute",
+        left: 30,
+        right: 30,
+        bottom: 20,
         backgroundColor: color,
-        height: "20px",
+        height: "2px",
       },
     },
     h(
@@ -40,6 +63,7 @@ export const Footer = ({ name, pct, color }) => {
       {
         style: {
           position: "relative",
+          width: prog + "%",
         },
       },
       [
@@ -52,7 +76,7 @@ export const Footer = ({ name, pct, color }) => {
               top: -30,
               width: "500px",
               textAlign: "center",
-              color,
+              color: "white",
             },
           },
           text(name)

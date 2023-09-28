@@ -29,7 +29,6 @@ const XinY = ({ x, y }) => {
 export class Room {
   constructor({ name, color }) {
     this._name = name;
-    this._color = color;
     this._words = [
       {
         value: "",
@@ -96,20 +95,16 @@ export class Room {
     }
   }
 
-  words() {
-    return this._words.map((x, i) => ({
-      index: i,
-      value: x.value,
-      status: x.status,
-      note: x.value === "" ? x.rules.map((y) => y.note).join(" ") : x.note,
-    }));
-  }
-
-  footer() {
+  status() {
     return {
       name: this._name,
-      color: this._color,
-      pct: Math.floor(
+      words: this._words.map((x, i) => ({
+        index: i,
+        value: x.value,
+        status: x.status,
+        note: x.value === "" ? x.rules.map((y) => y.note).join(" ") : x.note,
+      })),
+      prog: Math.floor(
         (this._words.filter((e) => e.status === "OK").length /
           this._words.length) *
           100
