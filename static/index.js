@@ -135,6 +135,26 @@ const Room = () => {
   );
 };
 
+const Sign = ({ message }) => {
+  return h(
+    "div",
+    {
+      style: {
+        width: "75%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "white",
+        height: "100px",
+        fontFamily: "Shinonome14B",
+        fontSize: "60px",
+      },
+    },
+    text(message)
+  );
+};
+
 const InitialState = (_state) => {
   return {
     room: { name: "" },
@@ -158,6 +178,10 @@ const dispatch = app({
         view.push(Arrow(), Box({ name: room.name, ...room.words[i] }));
       }
 
+      if (room.words.every((e) => e.status == "OK")) {
+        view.push(Arrow(), Sign({ message: "しりとり大魔王の元へ向かえ！" }));
+      }
+
       const bars = rooms.map((e) =>
         Bar({ name: e.name, prog: e.prog, color: "white" })
       );
@@ -166,7 +190,7 @@ const dispatch = app({
         rooms
           .sort((a, b) => (a.prog > b.prog ? -1 : 1))
           .findIndex((e) => e.name == room.name) + 1;
-      if (order > rooms.length / 2) {
+      if (order > rooms.length / 2 || room.prog > 90) {
         order = "?";
       }
 
