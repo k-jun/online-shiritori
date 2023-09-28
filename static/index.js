@@ -212,6 +212,5 @@ const Refresh = (state, payload) => {
 };
 
 socket.on("refresh", (payload) => {
-  console.log(payload);
   dispatch(Refresh, payload);
 });
