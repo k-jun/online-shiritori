@@ -37,7 +37,7 @@ function refresh(name) {
   io.to(name).emit("refresh", {
     room: {
       ...rooms[name]?.status(),
-      size: io.of("/").adapter.rooms.get(name).size,
+      size: io.of("/").adapter.rooms.get(name)?.size,
     },
     rooms: Object.keys(rooms).map((k) => rooms[k].status()),
   });
