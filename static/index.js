@@ -178,7 +178,7 @@ const dispatch = app({
         view.push(Arrow(), Box({ name: room.name, ...room.words[i] }));
       }
 
-      if (room.words.every((e) => e.status == "OK")) {
+      if (room.words.every((e) => e.status == "OK") && room.words.length > 10) {
         view.push(Arrow(), Sign({ message: "しりとり大魔王の元へ向かえ！" }));
       }
 

@@ -45,7 +45,8 @@ function refresh(name) {
 
 io.of("/").adapter.on("join-room", (name, id) => {
   if (name !== id && rooms[name] === undefined) {
-    rooms[name] = new Room({ name: name });
+    const env = Deno.env.get("ENV") || "staging";
+    rooms[name] = new Room({ name, env });
   }
 });
 

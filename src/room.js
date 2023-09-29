@@ -1,3 +1,28 @@
+const DAKUON = [
+  "が",
+  "ぎ",
+  "ぐ",
+  "げ",
+  "ご",
+  "ざ",
+  "じ",
+  "ず",
+  "ぜ",
+  "ぞ",
+  "だ",
+  "ぢ",
+  "づ",
+  "で",
+  "ど",
+  "ば",
+  "び",
+  "ぶ",
+  "べ",
+  "ぼ",
+];
+
+const YOUON = ["ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"];
+
 class Rule {
   constructor({ note, func }) {
     this.note = note;
@@ -9,64 +34,310 @@ class Rule {
   }
 }
 
-const shiritori = new Rule({
-  note: "しりとり",
-  func: (v, pv) => (pv === "" ? false : v[0] === pv[pv.length - 1]),
+export const hiragana = new Rule({
+  note: "ひらがな",
+  func: (_, v) => {
+    const reg = /^[\u3041-\u3093\u30FC]+$/;
+    return reg.test(v);
+  },
 });
 
-const shiritori1 = new Rule({
+export const shiritori = new Rule({
   note: "しりとり",
-  func: (v, _) => v !== "",
+  func: (pv, v) => {
+    if (pv.length <= 1 || v.length <= 1) {
+      return false;
+    }
+
+    pv = pv.replace(/ー/g, "");
+
+    let b = pv?.[pv.length - 1];
+    let f = v?.[0];
+
+    if (b === "ん") {
+      return false;
+    }
+
+    if (YOUON.includes(b)) {
+      b = pv?.[pv.length - 2] + pv?.[pv.length - 1];
+      f = v?.[0] + v?.[1];
+    }
+    return b === f;
+  },
 });
 
-const XinY = ({ x, y }) => {
+export const shiritori1 = new Rule({
+  note: "しりとり",
+  func: (_, v) => v.length > 1,
+});
+
+const Index = ({ x = "あ", y = 0 }) => {
   return new Rule({
     note: `ワードの${y + 1}番目の文字が『${x}』`,
-    func: (v, _) => v[y] === x,
+    func: (_, v) => v?.[y] === x,
+  });
+};
+
+const IndexLast = ({ x = "あ" }) => {
+  return new Rule({
+    note: `ワードの最後の文字が『${x}』`,
+    func: (_, v) => v?.[v?.length - 1] === x,
+  });
+};
+
+const IncludeMoreThan = ({ x = "濁音", y = 1, z = [] }) => {
+  return new Rule({
+    note: `ワードが${x}を${y}回以上含む`,
+    func: (_, v) => {
+      let count = 0;
+      for (var i = 0; i < v.length; i++) {
+        if (z.includes(v[i])) {
+          count += 1;
+        }
+      }
+      return count >= y;
+    },
+  });
+};
+
+export const Length = ({ x }) => {
+  return new Rule({
+    note: `ワードの文字数は ${x}文字`,
+    func: (_, v) => v.length === x,
+  });
+};
+
+export const LengthMoreThan = ({ x }) => {
+  return new Rule({
+    note: `ワードの文字数は ${x}文字以上`,
+    func: (_, v) => v.length >= x,
+  });
+};
+
+export const AlwaysTrue = ({ x }) => {
+  return new Rule({
+    note: x,
+    func: (_, v) => true,
+  });
+};
+
+export const MustBe = ({ x }) => {
+  return new Rule({
+    note: `ワードは『${x}』である`,
+    func: (_, v) => v === x,
   });
 };
 
 export class Room {
-  constructor({ name, color }) {
-    this._name = name;
-    this._words = [
+  constructor({ name, env }) {
+    const wordsProduction = [
       {
         value: "",
         status: "？",
         note: "",
-        rules: [shiritori1, XinY({ x: "き", y: 0 })],
+        rules: [hiragana, shiritori1, Index({ x: "き", y: 0 })],
       },
       {
         value: "",
         status: "？",
         note: "",
-        rules: [shiritori, XinY({ x: "ひ", y: 0 })],
+        rules: [hiragana, shiritori],
       },
       {
         value: "",
         status: "？",
         note: "",
-        rules: [shiritori, XinY({ x: "に", y: 0 })],
+        rules: [hiragana, shiritori],
       },
       {
         value: "",
         status: "？",
         note: "",
-        rules: [shiritori1, XinY({ x: "き", y: 0 })],
+        rules: [hiragana, shiritori],
       },
       {
         value: "",
         status: "？",
         note: "",
-        rules: [shiritori, XinY({ x: "ひ", y: 0 })],
+        rules: [hiragana, shiritori, Index({ x: "ろ", y: 0 })],
       },
       {
         value: "",
         status: "？",
         note: "",
-        rules: [shiritori, XinY({ x: "に", y: 0 })],
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [
+          hiragana,
+          shiritori,
+          IncludeMoreThan({
+            x: "濁音",
+            y: 2,
+            z: DAKUON,
+          }),
+        ],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori, Length({ x: 6 })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [
+          hiragana,
+          shiritori,
+          AlwaysTrue({
+            x: "ワードは チームメンバーを 50音順に並べたとき 最後に来る人が持っている",
+          }),
+        ],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori, IndexLast({ x: "え" })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori, IndexLast({ x: "や" })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [
+          hiragana,
+          shiritori,
+          LengthMoreThan({ x: 6 }),
+          IncludeMoreThan({
+            x: "濁音",
+            y: 1,
+            z: DAKUON,
+          }),
+        ],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [
+          hiragana,
+          shiritori,
+          LengthMoreThan({ x: 6 }),
+          AlwaysTrue({ x: "ワードは 人の顔が写っている" }),
+          IncludeMoreThan({
+            x: "拗音",
+            y: 2,
+            z: YOUON,
+          }),
+        ],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori, MustBe({ x: "しょうり" })],
       },
     ];
+
+    const wordsStaging = [
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori1, Index({ x: "え", y: 0 })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori, Length({ x: 4 })],
+      },
+      {
+        value: "",
+        status: "？",
+        note: "",
+        rules: [hiragana, shiritori],
+      },
+    ];
+
+    const env2words = {
+      staging: wordsStaging,
+      production: wordsProduction,
+    };
+
+    this._name = name;
+    this._words = env2words[env];
   }
 
   update({ index, value }) {
@@ -83,7 +354,7 @@ export class Room {
       const rules = this._words[i].rules;
       const previousValue = i === 0 ? "" : this._words[i - 1].value;
       for (let j = 0; j < rules.length; j++) {
-        const bool = rules[j].validate(this._words[i].value, previousValue);
+        const bool = rules[j].validate(previousValue, this._words[i].value);
         notes.push((bool ? "◯ " : "✕ ") + rules[j].note);
         if (!bool) {
           status = "NG";
