@@ -29,8 +29,8 @@ class Rule {
     this.func = func;
   }
 
-  validate(value, previousValue = "") {
-    return this.func(value, previousValue);
+  validate(previousValue = "", value = "") {
+    return this.func(previousValue, value);
   }
 }
 
@@ -40,6 +40,11 @@ export const hiragana = new Rule({
     const reg = /^[\u3041-\u3093\u30FC]+$/;
     return reg.test(v);
   },
+});
+
+export const shiritori1 = new Rule({
+  note: "しりとり",
+  func: (_, v) => v.length > 1,
 });
 
 export const shiritori = new Rule({
@@ -66,26 +71,21 @@ export const shiritori = new Rule({
   },
 });
 
-export const shiritori1 = new Rule({
-  note: "しりとり",
-  func: (_, v) => v.length > 1,
-});
-
-const Index = ({ x = "あ", y = 0 }) => {
+export const IndexFirst = ({ x = "" }) => {
   return new Rule({
-    note: `ワードの${y + 1}番目の文字が『${x}』`,
-    func: (_, v) => v?.[y] === x,
+    note: `ワードの最初の文字が『${x}』`,
+    func: (_, v) => v?.[0] === x,
   });
 };
 
-const IndexLast = ({ x = "あ" }) => {
+export const IndexLast = ({ x = "" }) => {
   return new Rule({
     note: `ワードの最後の文字が『${x}』`,
     func: (_, v) => v?.[v?.length - 1] === x,
   });
 };
 
-const IncludeMoreThan = ({ x = "濁音", y = 1, z = [] }) => {
+export const IncludeMoreThan = ({ x = "", y = 1, z = [] }) => {
   return new Rule({
     note: `ワードが${x}を${y}回以上含む`,
     func: (_, v) => {
@@ -100,14 +100,14 @@ const IncludeMoreThan = ({ x = "濁音", y = 1, z = [] }) => {
   });
 };
 
-export const Length = ({ x }) => {
+export const Length = ({ x = 1 }) => {
   return new Rule({
     note: `ワードの文字数は ${x}文字`,
     func: (_, v) => v.length === x,
   });
 };
 
-export const LengthMoreThan = ({ x }) => {
+export const LengthMoreThan = ({ x = 1 }) => {
   return new Rule({
     note: `ワードの文字数は ${x}文字以上`,
     func: (_, v) => v.length >= x,
@@ -121,7 +121,7 @@ export const AlwaysTrue = ({ x }) => {
   });
 };
 
-export const MustBe = ({ x }) => {
+export const Equal = ({ x = "" }) => {
   return new Rule({
     note: `ワードは『${x}』である`,
     func: (_, v) => v === x,
@@ -135,7 +135,7 @@ export class Room {
         value: "",
         status: "？",
         note: "",
-        rules: [hiragana, shiritori1, Index({ x: "き", y: 0 })],
+        rules: [hiragana, shiritori1, IndexFirst({ x: "き" })],
       },
       {
         value: "",
@@ -159,7 +159,7 @@ export class Room {
         value: "",
         status: "？",
         note: "",
-        rules: [hiragana, shiritori, Index({ x: "ろ", y: 0 })],
+        rules: [hiragana, shiritori, IndexFirst({ x: "ろ" })],
       },
       {
         value: "",
@@ -306,7 +306,7 @@ export class Room {
         value: "",
         status: "？",
         note: "",
-        rules: [hiragana, shiritori, MustBe({ x: "しょうり" })],
+        rules: [hiragana, shiritori, Equal({ x: "しょうり" })],
       },
     ];
 
@@ -315,7 +315,7 @@ export class Room {
         value: "",
         status: "？",
         note: "",
-        rules: [hiragana, shiritori1, Index({ x: "え", y: 0 })],
+        rules: [hiragana, shiritori1, IndexFirst({ x: "え" })],
       },
       {
         value: "",
