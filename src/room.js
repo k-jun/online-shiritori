@@ -269,7 +269,7 @@ export class Room {
         value: "",
         status: "？",
         note: "",
-        rules: [hiragana, shiritori, IndexLast({ x: "や" })],
+        rules: [hiragana, shiritori],
       },
       {
         value: "",
